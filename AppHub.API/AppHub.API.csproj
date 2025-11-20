@@ -13,6 +13,19 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
   </ItemGroup>
 
+  <!-- Prevent the API project from compiling the nested class library sources. They are referenced as projects below. -->
+  <ItemGroup>
+    <Compile Remove="AppHub.Domain\**\*.cs" />
+    <Compile Remove="AppHub.Infrastructure\**\*.cs" />
+    <Compile Remove="AppHub.Application\**\*.cs" />
+    <EmbeddedResource Remove="AppHub.Domain\**\*" />
+    <EmbeddedResource Remove="AppHub.Infrastructure\**\*" />
+    <EmbeddedResource Remove="AppHub.Application\**\*" />
+    <None Remove="AppHub.Domain\**\*" />
+    <None Remove="AppHub.Infrastructure\**\*" />
+    <None Remove="AppHub.Application\**\*" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="AppHub.Application\AppHub.Application.csproj" />
     <ProjectReference Include="AppHub.Infrastructure\AppHub.Infrastructure.csproj" />
