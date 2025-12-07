@@ -35,8 +35,26 @@ public class UsersController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<UserDto>> Create([FromBody] CreateUserDto createDto)
     {
+        var exists = await _service.ExistsByApplicationAndUsernameOrEmailAsync(
+            createDto.ApplicationId,
+            createDto.Username,
+            createDto.Email);
+
+        if (exists)
+            return Conflict(new { message = "Bu uygulamada aynı kullanıcı adı veya e-posta zaten kayıtlı." });
+
         var result = await _service.CreateAsync(createDto);
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+    }
+
+    [HttpPost("login")]
+    public async Task<ActionResult> Login([FromBody] LoginRequestDto loginDto)
+    {
+        var user = await _service.LoginAsync(loginDto);
+        if (user == null)
+            return Unauthorized(new { success = false, message = "Invalid application or credentials." });
+
+        return Ok(new { success = true, user });
     }
 
     [HttpPut("{id}")]

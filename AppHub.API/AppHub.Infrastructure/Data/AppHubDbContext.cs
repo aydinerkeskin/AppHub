@@ -36,6 +36,7 @@ public class AppHubDbContext : DbContext
             entity.ToTable("users");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
+            entity.Property(e => e.ApplicationId).HasColumnName("application_id").IsRequired();
             entity.Property(e => e.Username).HasColumnName("username").HasMaxLength(100).IsRequired();
             entity.Property(e => e.Email).HasColumnName("email").HasMaxLength(255).IsRequired();
             entity.Property(e => e.PasswordHash).HasColumnName("password_hash").HasMaxLength(255);
@@ -46,6 +47,11 @@ public class AppHubDbContext : DbContext
             entity.Property(e => e.LastLogin).HasColumnName("last_login");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.UpdatedAt).HasColumnName("updated_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.HasOne(e => e.Application)
+                .WithMany()
+                .HasForeignKey(e => e.ApplicationId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(e => e.ApplicationId);
             entity.HasIndex(e => e.Username).IsUnique();
             entity.HasIndex(e => e.Email).IsUnique();
         });

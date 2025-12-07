@@ -41,6 +41,7 @@ INSERT INTO oauth_providers (name) VALUES
 -- -----------------------------------------------------
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
+    application_id INTEGER NOT NULL,
     username VARCHAR(100) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(255), -- NULL olabilir çünkü OAuth kullanıcıları şifre olmayabilir
@@ -53,6 +54,7 @@ CREATE TABLE users (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT email_format CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
 );
+
 
 -- -----------------------------------------------------
 -- 3. User OAuth Bağlantıları Tablosu
@@ -83,6 +85,10 @@ CREATE TABLE applications (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE users
+    ADD CONSTRAINT fk_users_application
+    FOREIGN KEY (application_id) REFERENCES applications(id) ON DELETE RESTRICT;
 
 -- -----------------------------------------------------
 -- 5. Features Tablosu (Uygulama Özellikleri)
@@ -182,6 +188,7 @@ CREATE TABLE application_settings (
 -- =====================================================
 
 -- Users indexes
+CREATE INDEX idx_users_application_id ON users(application_id);
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_username ON users(username);
 CREATE INDEX idx_users_created_at ON users(created_at);

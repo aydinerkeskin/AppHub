@@ -50,6 +50,14 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserOAuthService, UserOAuthService>();
 builder.Services.AddScoped<IApplicationService, ApplicationService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy => policy
+        .AllowAnyOrigin()   // tüm origin’ler
+        .AllowAnyHeader()
+        .AllowAnyMethod());
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -63,6 +71,8 @@ app.UseSwaggerUI(options =>
     options.EnableFilter();
     options.ShowExtensions();
 });
+
+app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 app.UseAuthorization();

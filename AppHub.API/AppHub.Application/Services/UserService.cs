@@ -2,6 +2,7 @@ using AutoMapper;
 using AppHub.Application.DTOs.User;
 using AppHub.Domain.Entities;
 using AppHub.Infrastructure.UnitOfWork;
+using ApplicationEntity = AppHub.Domain.Entities.Application;
 
 namespace AppHub.Application.Services;
 
@@ -55,6 +56,23 @@ public class UserService : IUserService
         _unitOfWork.Repository<User>().Remove(entity);
         await _unitOfWork.SaveChangesAsync();
         return true;
+    }
+
+    public async Task<UserDto?> LoginAsync(LoginRequestDto loginDto)
+    {
+        var user = await _unitOfWork.Repository<User>()
+            .FirstOrDefaultAsync(u => u.Username == loginDto.Username 
+                                      && u.PasswordHash == loginDto.PasswordHash
+                                      && u.ApplicationId == loginDto.ApplicationId);
+
+        return user == null ? null : _mapper.Map<UserDto>(user);
+    }
+
+    public async Task<bool> ExistsByApplicationAndUsernameOrEmailAsync(int applicationId, string username, string email)
+    {
+        return await _unitOfWork.Repository<User>()
+            .ExistsAsync(u => u.ApplicationId == applicationId &&
+                              (u.Username == username || u.Email == email));
     }
 }
 
